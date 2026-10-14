@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "notifier"
+version = "0.1.0"
+description = "SQLite-backed agent notifications: macOS popups plus a local viewer"
+requires-python = ">=3.11"
+dependencies = ["flask>=3.0"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[project.scripts]
+notifier = "notifier.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["notifier*"]
+
+[tool.setuptools.package-data]
+notifier = ["templates/*.html", "static/*", "static/vendor/*"]

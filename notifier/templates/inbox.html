@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}{% if unread_total %}({{ unread_total }}) {% endif %}Inbox{% endblock %}
+{% block content %}
+<div class="inbox-head">
+  <h1>Notifications</h1>
+  <nav class="tabs">
+    <a href="{{ url_for('inbox') }}" class="{{ '' if unread_only else 'active' }}">All</a>
+    <a href="{{ url_for('inbox', filter='unread') }}" class="{{ 'active' if unread_only else '' }}">
+      Unread{% if unread_total %} <span class="count">{{ unread_total }}</span>{% endif %}
+    </a>
+  </nav>
+  {% if unread_total %}
+  <form method="post" action="{{ url_for('read_all') }}" class="inline">
+    <input type="hidden" name="next" value="{{ here }}">
+    <button class="btn">Mark all read</button>
+  </form>
+  {% endif %}
+</div>
+
+{% if rows %}
+<ul class="list">
+  {% for n in rows %}
+  {% set unread = n.read_at is none %}
+  <li class="item{{ ' unread' if unread }}">
+    <span class="dot" aria-label="{{ 'Unread' if unread else 'Read' }}"></span>
+    <a class="item-main" href="{{ url_for('show', nid=n.id) }}">
+      <span class="subject">{{ n.subject }}</span>
+      <span class="meta">
+        {% if n.source %}<span class="badge">{{ n.source }}</span>{% endif %}
+        <time datetime="{{ n.created_at }}" title="{{ n.created_at | localtime }}">{{ n.created_at | ago }}</time>
+      </span>
+    </a>
+    <form method="post" action="{{ url_for('mark_unread' if not unread else 'mark_read', nid=n.id) }}" class="inline">
+      <input type="hidden" name="next" value="{{ here }}">
+      <button class="btn ghost small" title="Mark as {{ 'read' if unread else 'unread' }}">
+        {{ 'Mark read' if unread else 'Mark unread' }}
+      </button>
+    </form>
+  </li>
+  {% endfor %}
+</ul>
+{% if pages > 1 %}
+<nav class="pager">
+  {% if page > 1 %}<a class="btn ghost" href="{{ url_for('inbox', page=page-1, filter='unread' if unread_only else None) }}">← Newer</a>{% else %}<span></span>{% endif %}
+  <span class="muted">Page {{ page }} of {{ pages }}</span>
+  {% if page < pages %}<a class="btn ghost" href="{{ url_for('inbox', page=page+1, filter='unread' if unread_only else None) }}">Older →</a>{% else %}<span></span>{% endif %}
+</nav>
+{% endif %}
+{% else %}
+<div class="empty">
+  <p>{{ "You're all caught up." if unread_only else "No notifications yet." }}</p>
+</div>
+{% endif %}
+{% endblock %}

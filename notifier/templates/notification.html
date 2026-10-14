@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}{{ n.subject }}{% endblock %}
+{% block content %}
+<div class="detail-nav">
+  <a class="btn ghost" href="{{ url_for('inbox') }}">← Inbox</a>
+  <div class="spacer"></div>
+  <form method="post" action="{{ url_for('mark_unread', nid=n.id) }}" class="inline">
+    <input type="hidden" name="next" value="{{ url_for('inbox') }}">
+    <button class="btn ghost">Mark unread</button>
+  </form>
+  {% if newer %}<a class="btn ghost" href="{{ url_for('show', nid=newer) }}" title="Newer">↑ Newer</a>{% endif %}
+  {% if older %}<a class="btn ghost" href="{{ url_for('show', nid=older) }}" title="Older">↓ Older</a>{% endif %}
+</div>
+
+<article class="card">
+  <header class="card-head">
+    <h1>{{ n.subject }}</h1>
+    <div class="meta">
+      {% if n.source %}<span class="badge">{{ n.source }}</span>{% endif %}
+      <time datetime="{{ n.created_at }}">{{ n.created_at | localtime }}</time>
+      <span class="muted">#{{ n.id }}</span>
+    </div>
+  </header>
+  <div class="content">
+    {{ n.body_html | safe }}
+  </div>
+</article>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='vendor/chart.umd.min.js') }}"></script>
+<script src="{{ url_for('static', filename='charts.js') }}"></script>
+{% endblock %}
