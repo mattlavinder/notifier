@@ -5,7 +5,7 @@
 
   const css = getComputedStyle(document.documentElement);
   const token = (name) => css.getPropertyValue(name).trim();
-  const palette = [1, 2, 3, 4, 5, 6].map((i) => token(`--chart-${i}`));
+  const palette = [1, 2, 3, 4, 5, 6, 7, 8].map((i) => token(`--chart-${i}`));
   const PER_POINT = new Set(["pie", "doughnut", "polarArea"]);
 
   Chart.defaults.color = token("--muted");
