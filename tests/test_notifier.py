@@ -123,3 +123,16 @@ def test_web_read_flow(conn, client):
 
     assert client.get("/n/9999").status_code == 404
     assert client.get("/api/recent").json["items"][0]["id"] == nid
+
+
+def test_state_changes_with_inbox(conn, client):
+    empty = client.get("/api/state").json
+    assert empty["unread"] == 0 and empty["latest_id"] == 0
+    nid = db.insert(conn, "x", "<p>x</p>")
+    added = client.get("/api/state")
+    assert added.headers["Cache-Control"] == "no-store"
+    assert added.json["latest_id"] == nid and added.json["version"] != empty["version"]
+    db.set_read(conn, nid, True)
+    assert client.get("/api/state").json["version"] != added.json["version"]
+    page = client.get("/").data.decode()
+    assert 'data-page="inbox"' in page and "live.js" in page

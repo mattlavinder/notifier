@@ -25,8 +25,9 @@ runs a test notification and warns (and opens Settings) if macOS still refuses. 
 - `notifier/watcher.py`: polls every 2 s and shells out to `terminal-notifier -open <url>`. It sets `notified_at` per row.
   - More than 5 pending rows in one poll produce a single summary popup that links to the unread inbox.
 - `notifier/web.py`: Flask app on 127.0.0.1 only.
-  - Routes: `/` inbox (All/Unread tabs, paging), `/n/<id>` (auto-marks read), POST `/n/<id>/read`, `/n/<id>/unread`, `/read-all`, and GET `/api/recent`.
-  - A strict CSP means only the app's own JS runs: `static/charts.js` plus the vendored Chart.js 4.4.1 in `static/vendor/`.
+  - Routes: `/` inbox (All/Unread tabs, paging), `/n/<id>` (auto-marks read), POST `/n/<id>/read`, `/n/<id>/unread`, `/read-all`, GET `/api/recent`, and GET `/api/state` (a fingerprint of the inbox).
+  - A strict CSP means only the app's own JS runs: `static/charts.js`, `static/live.js`, and the vendored Chart.js 4.4.1 in `static/vendor/`. `connect-src 'self'` exists only so `live.js` can poll.
+  - `live.js` polls `/api/state` every 10 s on every page. When the inbox changes, it updates the header badge and favicon, and on the inbox (`data-page="inbox"`) it re-fetches `/` and swaps `<main>`. It never re-fetches `/n/<id>`, because that GET marks the notification read.
 - `notifier/cli.py`: `notifier init|send|list|serve|watch`.
 - `notifier/templates/`, `notifier/static/app.css`: look and feel. Light and dark come from CSS tokens, and the CSS defines the agent component classes (`callout`, `metrics`/`metric`, `badge`, `grid-2`, `figure`).
 - `launchd/*.plist`: templates with `__VENV__` and `__LOGDIR__` placeholders that `scripts/install.sh` fills in.
@@ -36,7 +37,7 @@ runs a test notification and warns (and opens Settings) if macOS still refuses. 
 ## Dev
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -e '.[dev]'
-.venv/bin/pytest -q                      # 12 tests: sanitizer, db, watcher, web
+.venv/bin/pytest -q                      # 13 tests: sanitizer, db, watcher, web
 NOTIFIER_HOME=/tmp/nh NOTIFIER_PORT=8799 .venv/bin/notifier serve   # throwaway DB
 ```
 `.venv` exists locally and is gitignored.

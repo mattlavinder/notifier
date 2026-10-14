@@ -95,3 +95,12 @@ def neighbors(conn, notification_id: int) -> tuple[int | None, int | None]:
         "SELECT MIN(id) FROM notifications WHERE id > ?", (notification_id,)
     ).fetchone()[0]
     return older, newer
+
+
+def state(conn) -> dict:
+    """Cheap fingerprint of the inbox; changes on any new row or read/unread change."""
+    latest, unread, last_read = conn.execute(
+        "SELECT COALESCE(MAX(id), 0), COALESCE(SUM(read_at IS NULL), 0), COALESCE(MAX(read_at), '') "
+        "FROM notifications"
+    ).fetchone()
+    return {"latest_id": latest, "unread": unread, "version": f"{latest}:{unread}:{last_read}"}

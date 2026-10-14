@@ -118,6 +118,7 @@ Open **http://127.0.0.1:8765/** to see recent notifications:
 - **All** and **Unread** tabs, with the unread count in the header.
 - Opening a notification marks it read. You can mark any one read or unread from the inbox or the page.
 - **Mark all read** clears everything.
+- Open pages update on their own. Every 10 seconds the inbox picks up new notifications and read/unread changes, and the unread count, tab title and tab icon stay current.
 - `GET /api/recent?limit=20&filter=unread` returns the same data as JSON.
 
 ## Managing the services

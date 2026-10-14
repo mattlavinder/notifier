@@ -12,6 +12,8 @@
   Chart.defaults.borderColor = token("--border");
   Chart.defaults.font.family = token("--font");
   Chart.defaults.plugins.legend.labels.usePointStyle = true;
+  // Radar/polar tick labels get a white box by default, which glares in dark mode.
+  Chart.defaults.scales.radialLinear.ticks.backdropColor = "transparent";
 
   const alpha = (hex, a) => {
     const m = /^#([0-9a-f]{6})$/i.exec(hex);

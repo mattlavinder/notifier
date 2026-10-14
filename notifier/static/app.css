@@ -73,6 +73,7 @@ a:hover { text-decoration: underline; }
 .brand svg { color: var(--accent); }
 .brand:hover, .inbox-link:hover { text-decoration: none; }
 .inbox-link { color: var(--muted); font-weight: 550; }
+.count[hidden] { display: none; }
 .count {
   display: inline-block; min-width: 20px; padding: 0 6px; margin-left: 2px;
   border-radius: 999px; background: var(--accent); color: #fff;

@@ -6,7 +6,7 @@ from . import config, db
 
 CSP = (
     "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; "
-    "img-src 'self' data:; font-src 'self' data:; connect-src 'none'; "
+    "img-src 'self' data:; font-src 'self' data:; connect-src 'self'; "
     "form-action 'self'; base-uri 'none'; frame-ancestors 'none'"
 )
 
@@ -35,8 +35,9 @@ def security_headers(resp):
 
 
 @app.context_processor
-def inject_counts():
-    return {"unread_total": db.count(conn(), unread_only=True)}
+def inject_state():
+    state = db.state(conn())
+    return {"state": state, "unread_total": state["unread"]}
 
 
 def _parse(ts: str) -> datetime:
@@ -125,6 +126,14 @@ def api_recent():
         unread=db.count(conn(), unread_only=True),
         items=[dict(r) | {"url": config.notification_url(r["id"])} for r in rows],
     )
+
+
+@app.get("/api/state")
+def api_state():
+    # Polled by static/live.js to keep open pages current.
+    resp = jsonify(db.state(conn()))
+    resp.headers["Cache-Control"] = "no-store"
+    return resp
 
 
 @app.get("/favicon.ico")
