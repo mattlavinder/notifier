@@ -127,6 +127,12 @@ def api_recent():
     )
 
 
+@app.get("/favicon.ico")
+def favicon():
+    # Browsers request this path directly for non-HTML responses; point them at the SVG.
+    return redirect(url_for("static", filename="favicon.svg"), code=301)
+
+
 @app.errorhandler(404)
 def not_found(_e):
     return render_template("404.html"), 404
